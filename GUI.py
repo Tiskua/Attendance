@@ -35,11 +35,8 @@ class GUIS:
         select_period_label.config(font=('helvetica', 10, BOLD))
         select_period_label.place(relx=0.5,rely=0.35, anchor=CENTER)
 
-        print(str(self.config.getLastRanTime()))
-        print(str(date.today().strftime("%d")))
         if str(self.config.getLastRanTime()) != str(date.today().strftime("%d")):
             self.config.clearAbsentFile()
-            print("OLD ABSENT SHEET")
         self.config.setLastRanTime()
         
         PERIOD_OPTIONS = [period.strip() for period in self.config.getPeriodList().split(',')] 
@@ -74,7 +71,6 @@ class GUIS:
         def go_command():
             
             sheetclass.getAbsentFile()
-            print(sheetclass.absent_students)
             if len(sheetclass.absent_students) == 0:
                 absent_sheet_error['text'] = "Please Select An Absent Sheet!"
                 return
@@ -99,7 +95,7 @@ class GUIS:
         def showLoading():
             loading.config(text="Scanning PDF File...")
             loading.config(font=('helvetica', 10, BOLD))
-            loading.place(relx=0.5,rely=0.7, anchor=CENTER)
+            loading.place(relx=0.5,rely=0.72, anchor=CENTER)
 
         def showFinished():
             loading.config(text="Finished Scanning PDF File!")
@@ -110,12 +106,17 @@ class GUIS:
             absent_sheet_error['text'] = ""
             absent_file = filedialog.askopenfilename(initialdir="/Desktop", title="Select Absent Sheet", filetypes=(("pdf files", "*.pdf"),("all files", "*.*")))
             if(absent_file == ""): return
+            showLoading()
             if not absent_file.endswith(".pdf"): 
+                loading['text'] = ""
                 absent_sheet_error['text'] = "The File must be a PDF"
                 return
+            
+            if not sheetclass.setAbsentFile(absent_file):
+                absent_sheet_error['text'] = "Could not find the APIS to read the File!"
+                loading['text'] = ""
+                return
 
-            showLoading()
-            sheetclass.setAbsentFile(absent_file)
             sheetclass.getAbsentFile()
             select_absent_file_button['text'] = 'A File is Selected'
             showFinished()

@@ -140,6 +140,8 @@ class sheet:
 
 
     def getAbsentFile(self):
+        if os.path.exists("apis\\temp.txt"):
+            os.remove("apis\\temp.txt")
         file = open("absent.txt", "r")
         hasContent = False
         for line in file:
@@ -150,8 +152,13 @@ class sheet:
 
     def setAbsentFile(self, file_location):
         if(file_location == ""): return
-        pytesseract.pytesseract.tesseract_cmd = r'apis\\Tesseract-OCR\\tesseract.exe'
-        pages = convert_from_path(file_location, 500,poppler_path=r'apis\\Poppler\\bin')
+       
+        try:
+            pytesseract.pytesseract.tesseract_cmd = r'apis\\Tesseract-OCR\\tesseract.exe'
+            pages = convert_from_path(file_location, 500,poppler_path=r'apis\\Poppler\\bin')
+        except:
+            print("Could not find API's. Make sure they are in the apis folder.")
+            return False
         file = open("absent.txt", "w")
 
         add_lines = []
@@ -164,8 +171,9 @@ class sheet:
                     newstring = ''.join([i for i in sorted_line if not i.isdigit()])
                     add_lines.append(newstring.strip() + "\n")
         file.writelines(add_lines)
-        file.close()       
+        file.close()     
         os.startfile(file_location)   
+        return True
                     
 
     def readStudentList(self, sheet):

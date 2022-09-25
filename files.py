@@ -1,4 +1,5 @@
 import configparser
+import os
 from datetime import date
 
 config = configparser.ConfigParser()
@@ -6,12 +7,31 @@ config = configparser.ConfigParser()
 class Files: 
     def __init__(self):
         config.read("config.ini")
+        self.checkFiles()
+        self.checkSections()
+    
+    def checkFiles(self):
+        if not os.path.exists("config.ini"): 
+            print("created config file")
+            open("config.ini", "w")
+        if not os.path.exists("students.txt"): 
+            print("created students file")
+            open("students.txt", "w")
+        if not os.path.exists("absent.txt"): 
+            print("created absent file")
+            open("absent.txt", "w")
+
+    def checkSections(self):
+        if not config.has_section("Sheet_Info"):
+            config.add_section("Sheet_Info")
+        if config.has_section("Periods_Settings") == False:
+            config.add_section("Periods_Settings")
+        if not config.has_section("Time"):
+            config.add_section('Time')
+        with open("config.ini", "w") as configfile:
+            config.write(configfile)
 
     def writeSpreadSheetLink(self, link : str):
-        
-        if config.has_section("Sheet_Info") == False:
-            config.add_section("Sheet_Info")
-
         link_ID = link.split('/')[5]
         config.set("Sheet_Info","link", link)
         config.set("Sheet_Info","id", link_ID)
@@ -20,12 +40,7 @@ class Files:
 
     def getPeriodList(self):
         default_period_list = ["Period 1", "Period 2", "Period 3"]
-        if config.has_section("Periods_Settings") == False:
-            config.add_section("Periods_Settings")
-            config.set("Periods_Settings", "period_list", str(default_period_list))
-            with open("config.ini", "w") as configfile:
-                config.write(configfile)
-        elif config.has_option("Periods_Settings", "period_list") == False: 
+        if not config.has_option("Periods_Settings", "period_list"): 
             config.set("Periods_Settings", "period_list", str(default_period_list))
             with open("config.ini", "w") as configfile:
                 config.write(configfile)
@@ -38,7 +53,6 @@ class Files:
             config.write(configfile)
 
     def getSpreadSheetLink(self):
-        # config.read("config.ini")
         if(config.has_option("Sheet_Info", "link")): return config.get("Sheet_Info", "link")
         else: return "Please Enter the URL of a Google Sheet"
 
@@ -81,10 +95,7 @@ class Files:
         with open("config.ini", "w") as configfile:
             config.write(configfile)
 
-    def setLastRanTime(self):
-        if not config.has_section("Time"):
-            config.add_section('Time')
-            
+    def setLastRanTime(self):      
         today = date.today()
         config.set("Time", "last_ran_day", str(today.strftime("%d")))
         with open("config.ini", "w") as configfile:
