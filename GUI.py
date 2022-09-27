@@ -1,5 +1,7 @@
 import time
 import tkinter as tk
+import webbrowser
+
 from tkinter import filedialog
 from files import *
 
@@ -27,7 +29,7 @@ class GUIS:
     def open_Main_GUI(self):
         self.root.title('Select Options')
         self.root.resizable(False, False)
-
+        
         canvas = tk.Canvas(self.root, height=600, width=600, bg=self.BACKGROUND_COLOR, highlightthickness = 10, highlightbackground =self.BORDER_COLOR)
         canvas.pack()
 
@@ -127,7 +129,30 @@ class GUIS:
 
         if sheetclass.getAbsentFile(): select_absent_file_button['text'] = 'A File is Selected!'
 
+        if self.config.updateAviable(): self.showUpdateGUI(True)
+           
         self.root.mainloop()
+
+    def showUpdateGUI(self, needToUpdate):
+        update_window = tk.Toplevel(self.root)
+        update_window.resizable=(False,False)
+        update_window.title("Update")
+
+        update_canvas = tk.Canvas(update_window, height=100, width=350, bg=self.BACKGROUND_COLOR, highlightthickness = 10, highlightbackground = self.BORDER_COLOR)
+        update_canvas.pack()
+
+        if needToUpdate:
+            def openDownload():
+                self.config.downloadNewVersion()
+                webbrowser.open_new_tab('https://github.com/Tiskua/Attendance')
+                
+            version = tk.Button(update_canvas, text="An update is available! Click to download!",padx=5,pady=2, bg=self.BORDER_COLOR, command=openDownload)
+            version.config(font=('helvetica', 10, BOLD))
+            version.place(relx=0.5,rely=0.5, anchor=CENTER)
+        else:
+            version = tk.Label(update_canvas, text="You are Running  the Latest Version!",padx=5,pady=2, bg=self.BORDER_COLOR)
+            version.config(font=('helvetica', 10, BOLD))
+            version.place(relx=0.5,rely=0.5, anchor=CENTER)
 
     def open_Settings_GUI(self):
         sheetclass.sheets_list.clear()
@@ -404,6 +429,17 @@ class GUIS:
         result_message = tk.Label(settings_window, text="", bg=self.BACKGROUND_COLOR, justify=tk.RIGHT)
         result_message.config(font=('helvetica', 10, BOLD), fg='red')
         result_message.place(relx=0.04,rely=ypos+0.45)
+
+        version_label = tk.Label(settings_window, text="version: " + self.config.getVersion(), bg=self.BACKGROUND_COLOR)
+        version_label.config(font=('helvetica', 9, BOLD))
+        version_label.place(relx=0.89,rely=0.95)
+
+        def checkForUpdate():
+            self.showUpdateGUI(self.config.updateAviable())
+
+        update_button = tk.Button(settings_window, text="Check For Update", bg=BUTTON_COLOR, fg=BUTTON_TEXT_COLOR, command=lambda: checkForUpdate())
+        update_button.config(font=('helvetica', 9))
+        update_button.place(relx=0.74,rely=0.95, height=25)
 
 
     def open_Attendence_GUI(self):

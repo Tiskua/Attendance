@@ -1,5 +1,7 @@
 import configparser
 import os
+import urllib3
+import requests
 from datetime import date
 
 config = configparser.ConfigParser()
@@ -12,14 +14,17 @@ class Files:
     
     def checkFiles(self):
         if not os.path.exists("config.ini"): 
-            print("created config file")
-            open("config.ini", "w")
+            open("config.ini", "x")
         if not os.path.exists("students.txt"): 
-            print("created students file")
-            open("students.txt", "w")
+            open("students.txt", "x")
         if not os.path.exists("absent.txt"): 
-            print("created absent file")
-            open("absent.txt", "w")
+            open("absent.txt", "x")
+        if not os.path.exists("students.txt"): 
+            open("students.txt", "x")
+        if not os.path.exists("version.txt"): 
+            file = open("version.txt", "x")
+            file.write("1.0")
+            file.close()
 
     def checkSections(self):
         if not config.has_section("Sheet_Info"):
@@ -110,3 +115,32 @@ class Files:
     def clearAbsentFile(self):
         open("absent.txt", "w").close()
     
+    def updateAviable(self):
+        http = urllib3.PoolManager()
+        user_version_file = open("version.txt", "r")
+        user_version = user_version_file.readline()
+        web_version = http.request('GET', 'https://benevolent-swan-bb1bee.netlify.app/version.txt')
+
+        if(float(user_version) != float(web_version.data)):
+            print("An update is available!")
+            return True
+        return False
+    
+    def getVersion(self):
+        user_version_file = open("version.txt", "r")
+        user_version = user_version_file.readline()
+        return user_version
+
+    def downloadNewVersion(self):
+        
+        downloadURL = "https://github.com/Tiskua/Attendance/raw/main/GUI.exe"
+        try:
+            req = requests.get(downloadURL)
+            with open("GUI.exe", 'wb') as f:
+                for chunk in req.iter_content(chunk_size=8192):
+                    if chunk: f.write(chunk)
+        except:
+            print("There was an error trying to download from the URL!")
+
+        
+
