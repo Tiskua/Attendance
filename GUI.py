@@ -150,7 +150,7 @@ class GUIS:
             version.config(font=('helvetica', 10, BOLD))
             version.place(relx=0.5,rely=0.5, anchor=CENTER)
         else:
-            version = tk.Label(update_canvas, text="You are Running  the Latest Version!",padx=5,pady=2, bg=self.BORDER_COLOR)
+            version = tk.Label(update_canvas, text="You are Running the Latest Version!",padx=5,pady=2, bg=self.BACKGROUND_COLOR)
             version.config(font=('helvetica', 10, BOLD))
             version.place(relx=0.5,rely=0.5, anchor=CENTER)
 
