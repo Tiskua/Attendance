@@ -122,11 +122,19 @@ class Files:
         web_version = http.request('GET', 'https://benevolent-swan-bb1bee.netlify.app/version.txt')
 
         if(float(user_version) != float(web_version.data)):
-            print("An update is available!")
             return True
         return False
+
+    def writeVersion(self, version):
+        with open('version.txt', 'w') as f:
+            f.write(str(version))
     
-    def getVersion(self):
+    def getWebVersion(self):
+        http = urllib3.PoolManager()
+        web_version = http.request('GET', 'https://benevolent-swan-bb1bee.netlify.app/version.txt')
+        return float(web_version.data)
+
+    def getUserVersion(self):
         user_version_file = open("version.txt", "r")
         user_version = user_version_file.readline()
         return user_version
@@ -136,11 +144,14 @@ class Files:
         downloadURL = "https://github.com/Tiskua/Attendance/raw/main/GUI.exe"
         try:
             req = requests.get(downloadURL)
-            with open("GUI.exe", 'wb') as f:
+            with open("GUI-" + self.getWebVersion() + ".exe", 'wb') as f:
                 for chunk in req.iter_content(chunk_size=8192):
                     if chunk: f.write(chunk)
+            return True
         except:
+
             print("There was an error trying to download from the URL!")
+            return False
 
         
 

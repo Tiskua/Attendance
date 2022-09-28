@@ -11,11 +11,10 @@ import os
 class sheet:
     def __init__(self):
         self.sheets_list = []
-        SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-        SERVICE_ACCOUNT_FILE = 'keys.json'
+        self.SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+        self.SERVICE_ACCOUNT_FILE = 'keys.json'
         self.creds = None
-        self.creds = service_account.Credentials.from_service_account_file(
-                SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        self.setKeyFile()
         self.config = Files()
         self.students_attendance = []
         self.absent_students = []
@@ -201,6 +200,15 @@ class sheet:
             file.close()
         except HttpError as err:
             print(err)
+
+    def setKeyFile(self):
+        try:
+            self.creds = service_account.Credentials.from_service_account_file(
+                self.SERVICE_ACCOUNT_FILE, scopes=self.SCOPES)
+            return True
+        except:
+            return False
+
 
 
 

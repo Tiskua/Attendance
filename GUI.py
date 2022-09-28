@@ -1,8 +1,9 @@
 import time
 import tkinter as tk
-import webbrowser
+
 
 from tkinter import filedialog
+from tkinter import messagebox
 from files import *
 
 from tkinter import CENTER, RAISED, SUNKEN, Image, Toplevel
@@ -10,7 +11,6 @@ from tkinter.font import BOLD
 from PIL import ImageTk, Image
 from threading import Thread        
 from datetime import date
-
 
 
 from sheets import *
@@ -25,8 +25,10 @@ class GUIS:
 
         self.selected_day = '1'
         self.selected_period = 1
+        self.version = 1.0
         
     def open_Main_GUI(self):
+        
         self.root.title('Select Options')
         self.root.resizable(False, False)
         
@@ -40,6 +42,8 @@ class GUIS:
         if str(self.config.getLastRanTime()) != str(date.today().strftime("%d")):
             self.config.clearAbsentFile()
         self.config.setLastRanTime()
+
+        self.config.writeVersion(self.version)
         
         PERIOD_OPTIONS = [period.strip() for period in self.config.getPeriodList().split(',')] 
 
@@ -115,7 +119,7 @@ class GUIS:
                 return
             
             if not sheetclass.setAbsentFile(absent_file):
-                absent_sheet_error['text'] = "Could not find the APIS to read the File!"
+                absent_sheet_error['text'] = "APIS are missing or invalid to read the File!"
                 loading['text'] = ""
                 return
 
@@ -130,7 +134,9 @@ class GUIS:
         if sheetclass.getAbsentFile(): select_absent_file_button['text'] = 'A File is Selected!'
 
         if self.config.updateAviable(): self.showUpdateGUI(True)
-           
+        
+        if not sheetclass.setKeyFile():
+            messagebox.showerror("Error","key.json file is invalid or missing!")
         self.root.mainloop()
 
     def showUpdateGUI(self, needToUpdate):
@@ -143,10 +149,10 @@ class GUIS:
 
         if needToUpdate:
             def openDownload():
-                self.config.downloadNewVersion()
-                webbrowser.open_new_tab('https://github.com/Tiskua/Attendance')
+                if self.config.downloadNewVersion(): pass
+                else: messagebox.showerror("Error", "There was an error trying to Download the Update!")
                 
-            version = tk.Button(update_canvas, text="An update is available! Click to download!",padx=5,pady=2, bg=self.BORDER_COLOR, command=openDownload)
+            version = tk.Button(update_canvas, text="An update is available! Click to Download!",padx=5,pady=2, bg=self.BORDER_COLOR, command=openDownload)
             version.config(font=('helvetica', 10, BOLD))
             version.place(relx=0.5,rely=0.5, anchor=CENTER)
         else:
@@ -430,7 +436,7 @@ class GUIS:
         result_message.config(font=('helvetica', 10, BOLD), fg='red')
         result_message.place(relx=0.04,rely=ypos+0.45)
 
-        version_label = tk.Label(settings_window, text="version: " + self.config.getVersion(), bg=self.BACKGROUND_COLOR)
+        version_label = tk.Label(settings_window, text="version: " + self.config.getUserVersion(), bg=self.BACKGROUND_COLOR)
         version_label.config(font=('helvetica', 9, BOLD))
         version_label.place(relx=0.89,rely=0.95)
 
