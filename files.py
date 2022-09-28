@@ -144,12 +144,11 @@ class Files:
         downloadURL = "https://github.com/Tiskua/Attendance/raw/main/GUI.exe"
         try:
             req = requests.get(downloadURL)
-            with open("GUI-" + self.getWebVersion() + ".exe", 'wb') as f:
+            with open("GUI-" + str(self.getWebVersion()) + ".exe", 'xb') as f:
                 for chunk in req.iter_content(chunk_size=8192):
                     if chunk: f.write(chunk)
             return True
         except:
-
             print("There was an error trying to download from the URL!")
             return False
 
