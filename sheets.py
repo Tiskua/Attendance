@@ -156,7 +156,6 @@ class sheet:
             pytesseract.pytesseract.tesseract_cmd = r'apis\\Tesseract-OCR\\tesseract.exe'
             pages = convert_from_path(file_location, 500,poppler_path=r'apis\\Poppler\\bin')
         except:
-            print("Could not find API's. Make sure they are in the apis folder.")
             return False
         file = open("absent.txt", "w")
 

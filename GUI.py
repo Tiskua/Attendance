@@ -80,10 +80,12 @@ class GUIS:
             if len(sheetclass.absent_students) == 0:
                 absent_sheet_error['text'] = "Please Select An Absent Sheet!"
                 return
+            sheetclass.students_attendance.clear()
             sheetclass.getStudents()
             p = self.selected_period.get().split(" ")[1]
             d = self.selected_day.get().split(" ")[1]
-
+            
+            
             sheetclass.getFormData(self.config.getPeriodSheetName(p), self.config.getPeriodSheetID(p), p, d)
             self.open_Attendence_GUI()  
 
@@ -119,7 +121,7 @@ class GUIS:
                 return
             
             if not sheetclass.setAbsentFile(absent_file):
-                absent_sheet_error['text'] = "APIS are missing or invalid to read the File!"
+                messagebox.showerror("Error","Could not read the pdf files! Make sure they are in the apis folder!")
                 loading['text'] = ""
                 return
 
@@ -132,11 +134,10 @@ class GUIS:
         select_absent_file_button.place(relx=0.13, rely=0.08, height=25,width=120, anchor=CENTER)
 
         if sheetclass.getAbsentFile(): select_absent_file_button['text'] = 'A File is Selected!'
-
         if self.config.updateAviable(): self.showUpdateGUI(True)
         
-        if not sheetclass.setKeyFile():
-            messagebox.showerror("Error","key.json file is invalid or missing!")
+        if not sheetclass.setKeyFile(): messagebox.showerror("Error","key.json file is invalid or missing!")
+        
         self.root.mainloop()
 
     def showUpdateGUI(self, needToUpdate):
@@ -438,14 +439,14 @@ class GUIS:
 
         version_label = tk.Label(settings_window, text="version: " + self.config.getUserVersion(), bg=self.BACKGROUND_COLOR)
         version_label.config(font=('helvetica', 9, BOLD))
-        version_label.place(relx=0.89,rely=0.95)
+        version_label.place(relx=0.88,rely=0.95)
 
         def checkForUpdate():
             self.showUpdateGUI(self.config.updateAviable())
 
         update_button = tk.Button(settings_window, text="Check For Update", bg=BUTTON_COLOR, fg=BUTTON_TEXT_COLOR, command=lambda: checkForUpdate())
         update_button.config(font=('helvetica', 9))
-        update_button.place(relx=0.74,rely=0.95, height=25)
+        update_button.place(relx=0.74,rely=0.95, height=22)
 
 
     def open_Attendence_GUI(self):
@@ -459,7 +460,6 @@ class GUIS:
             list_sorted_by_last = sorted(sheetclass.students_attendance, key=lambda d: d['last_name'].lower())
 
             total_count = 0
-
             present_count = 0
             absent_count = 0
             wrong_count = 0
