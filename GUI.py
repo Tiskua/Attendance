@@ -4,6 +4,7 @@ import tkinter as tk
 
 from tkinter import filedialog
 from tkinter import messagebox
+from turtle import st
 from files import *
 
 from tkinter import CENTER, RAISED, SUNKEN, Image, Toplevel
@@ -26,6 +27,8 @@ class GUIS:
         self.selected_day = '1'
         self.selected_period = 1
         self.version = 1.0
+
+        self.confirm = False
         
     def open_Main_GUI(self):
         
@@ -74,11 +77,12 @@ class GUIS:
         absent_sheet_error = tk.Label(canvas, text="", bg=self.BACKGROUND_COLOR, fg="red")
         absent_sheet_error.config(font=('helvetica', 10, BOLD))
         absent_sheet_error.place(relx=0.5, rely=0.68,anchor=CENTER)
+        
         def go_command():
-            
             sheetclass.getAbsentFile()
-            if len(sheetclass.absent_students) == 0:
-                absent_sheet_error['text'] = "Please Select An Absent Sheet!"
+            if len(sheetclass.absent_students) == 0 and not self.confirm: 
+                absent_sheet_error['text'] = "Warning! An Absent Sheet is not selected!"
+                self.confirm = True
                 return
             sheetclass.students_attendance.clear()
             sheetclass.getStudents()
@@ -458,7 +462,6 @@ class GUIS:
 
         def showAttendance():
             list_sorted_by_last = sorted(sheetclass.students_attendance, key=lambda d: d['last_name'].lower())
-
             total_count = 0
             present_count = 0
             absent_count = 0
@@ -478,14 +481,14 @@ class GUIS:
             row_num = 0
 
             for student in list_sorted_by_last:
-                
-                if(student['period'].strip() != self.selected_period.get().split(" ")[1].strip()):continue
-                if(int(student['day']) != int(self.selected_day.get().split(" ")[1]) and int(student['day']) != 12): continue
+                if(student['period'].strip() != self.selected_period.get().split(" ")[1].strip()):
+                    continue
+                if(int(student['day']) != int(self.selected_day.get().split(" ")[1]) and int(student['day']) != 12): 
+                    continue
 
                 total_count+=1
                 student_label = tk.Label(attendance_window, text=student['last_name'] + ", " + student['first_name'])
                 student_label.config(font=('helvetica', 9, BOLD))
-
                 if(student['attendance'] == "PRESENT"):
                     student_label.config(bg="spring green")
                     present_count +=1
