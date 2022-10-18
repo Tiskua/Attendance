@@ -72,10 +72,12 @@ class sheet:
                 
                 found = False
                 for student in self.students_attendance:
-                    if student['first_name'] == first_name and student['last_name'] == last_name:
+                    if student['day'].strip() != day and student['day'].strip()!= '12': continue
+                    if (student['first_name'].lower() == first_name.lower() and student['last_name'].lower() == last_name.lower() 
+                    and student['period'].strip() == period):
                         if student['attendance'] == "ABSENT": student['attendance'] = "LATE"
-                        else: student['attendance'] = "PRESENT"
-                        
+                        else: 
+                            student['attendance'] = "PRESENT"
                         found = True
                         break  
                 if not found:
